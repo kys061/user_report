@@ -147,22 +147,22 @@ def make_his_df(_history, _type, _select_attr):
 def get_url(_type, _select_att, _from, _until, max=False):
     if _type is 'download':
         if max is False:
-            rest_url = REST_PROTO+'://'+REST_SERVER+':'+REST_PORT+REST_BASIC_PATH+r'users/?select=' + _select_att + '&order=%3C'+ _select_att +'&limit=5&total=post&with='+ _select_att +'%3E%3D1&from=15%3A00%3A00_' + _from + '&until=14%3A59%3A59_' + _until
-            # print(rest_url)
+            rest_url = REST_PROTO+'://'+REST_SERVER+':'+REST_PORT+REST_BASIC_PATH+r'users/?select=' + _select_att + r'&order=%3C'+ _select_att +r'&limit=5&total=post&with='+ _select_att +r'>%3D0.01&from=15%3A00%3A00_' + _from + r'&until=14%3A59%3A59_' + _until
+            print(rest_url)
             return rest_url
         else:
-            rest_url =  REST_PROTO+'://'+REST_SERVER+':'+REST_PORT+REST_BASIC_PATH+r'/users/?select=' + _select_att + r'&from=15%3A00%3A00_' + _from + '&until=14%3A59%3A00_' + _until + '&operation=raw&history_points=true&token=%2Frest%2Fstm%2Fconfigurations%2Frunning%2Fusers%2F&with='+_select_att+'%3E%3D0.01&limit=5&order=%3C'+_select_att
-            # print(rest_url)
+            rest_url =  REST_PROTO+'://'+REST_SERVER+':'+REST_PORT+REST_BASIC_PATH+r'/users/?select=' + _select_att + r'&from=15%3A00%3A00_' + _from + r'&until=14%3A59%3A00_' + _until + r'&operation=raw&history_points=true&token=%2Frest%2Fstm%2Fconfigurations%2Frunning%2Fusers%2F&with='+_select_att+r'%3E%3D0.01&limit=5&order=%3C'+_select_att
+            print(rest_url)
             return rest_url
 
     if _type is 'upload':
         if max is False:
-            rest_url = REST_PROTO+'://'+REST_SERVER+':'+REST_PORT+REST_BASIC_PATH+r'users/?select=' + _select_att + '&order=%3C'+ _select_att +'&limit=5&total=post&with='+ _select_att +'%3E%3D1&from=15%3A00%3A00_' + _from + '&until=14%3A59%3A59_' + _until
-            # print(rest_url)
+            rest_url = REST_PROTO+'://'+REST_SERVER+':'+REST_PORT+REST_BASIC_PATH+r'users/?select=' + _select_att + r'&order=%3C'+ _select_att +r'&limit=5&total=post&with='+ _select_att +r'>%3D0.01&from=15%3A00%3A00_' + _from + r'&until=14%3A59%3A59_' + _until
+            print(rest_url)
             return rest_url
         else:
-            rest_url = REST_PROTO + '://' + REST_SERVER + ':' + REST_PORT + REST_BASIC_PATH + r'/users/?select=' + _select_att + r'&from=15%3A00%3A00_' + _from + '&until=14%3A59%3A00_' + _until + '&operation=raw&history_points=true&token=%2Frest%2Fstm%2Fconfigurations%2Frunning%2Fusers%2F&with=' + _select_att + '%3E%3D0.01&limit=5&order=%3C' + _select_att
-            # print(rest_url)
+            rest_url = REST_PROTO + '://' + REST_SERVER + ':' + REST_PORT + REST_BASIC_PATH + r'/users/?select=' + _select_att + r'&from=15%3A00%3A00_' + _from + r'&until=14%3A59%3A00_' + _until + r'&operation=raw&history_points=true&token=%2Frest%2Fstm%2Fconfigurations%2Frunning%2Fusers%2F&with=' + _select_att + r'%3E%3D0.01&limit=5&order=%3C' + _select_att
+            print(rest_url)
             return rest_url
 
 
@@ -206,7 +206,7 @@ def main():
     print (FROM + ' - ' + UNTIL)
 
 
-    get_url('download', 'dest_byte_count', FROM, UNTIL)
+    # get_url('download', 'dest_byte_count', FROM, UNTIL)
     ROOT_URL = r'http://1.214.46.170:5000/rest/stm/configurations/running/'
     # SELECT_USERS = r'users/?select=total_rate&from=07%3A50%3A00_20170329&until=08%3A10%3A00_20170329&operation=raw&history_points=true&token=%2Frest%2Fstm%2Fconfigurations%2Frunning%2Fusers%2F&with=total_rate%3E%3D0.01&limit=3&order=%3Ctotal_rate'
     #/users/?select=total_rate&order=%3Ctotal_rate&limit=5&total=post&with=total_rate%3E%3D0.01&from=09%3A09%3A00_20170403&until=09%3A09%3A00_20170404
@@ -264,18 +264,64 @@ def main():
 
     df_users_upload_max_vol_history = make_his_df(users_upload_max_vol_history, 'upload', '_history_source_smoothed_rate')
     df_users_download_max_vol_history = make_his_df(users_download_max_vol_history, 'download', '_history_dest_smoothed_rate')
+
+    print(df_users_download_vol_history.head(n=5))
+    print(df_users_upload_vol_history.head(n=5))
+    print(df_users_upload_rate_history.head(n=5))
+    print(df_users_download_rate_history.head(n=5))
+    # print(df_users_upload_max_vol_history)
     # print(df_users_download_max_vol_history.loc[:, 'username'] == 'User-10.20.195.41')
+    _username_upload_max = []
+    _from_upload_max = []
+    _until_upload_max = []
+    _upload_max_rate = []
     print('##################### UPLOAD #########################')
     for username in df_users_upload_max_vol_history['username'].unique():
-        _df = df_users_upload_max_vol_history.loc[df_users_upload_max_vol_history.loc[:, 'username'] == username, ["username", "history_time", "_history_source_smoothed_rate"]]
-        print('### {}, {}'.format(username, _df['_history_source_smoothed_rate'].max()))
+        _df = df_users_upload_max_vol_history.loc[df_users_upload_max_vol_history.loc[:, 'username'] == username, ["username", "from", "until", "history_time", "_history_source_smoothed_rate"]]
+        _username_upload_max.append(username)
+        _from_upload_max.append(_df['from'].unique()[0])
+        _until_upload_max.append(_df['until'].unique()[0])
+        _upload_max_rate.append(_df['_history_source_smoothed_rate'].max())
+        # print('### {}, {}'.format(username, _df['_history_source_smoothed_rate'].max()))
+
+    # print(_username_upload_max, _from_upload_max, _until_upload_max, _upload_max_rate)
+
+    _l_users_upload_max_rate = list(zip(_username_upload_max, _from_upload_max, _until_upload_max, _upload_max_rate))
+    _df_users_upload_max_rate = pd.DataFrame(data=_l_users_upload_max_rate,
+                                             columns=['username',
+                                                      'from',
+                                                      'until',
+                                                      'max_upload_rate'
+                                                      ])
+
+    print(_df_users_upload_max_rate.sort(columns='max_upload_rate', ascending=False))
+
+
 
     print('##################### DOWNLOAD #########################')
+    _username_download_max = []
+    _from_download_max = []
+    _until_download_max = []
+    _download_max_rate = []
     for username in df_users_download_max_vol_history['username'].unique():
-        _df = df_users_download_max_vol_history.loc[df_users_download_max_vol_history.loc[:, 'username'] == username, ["username", "history_time", "_history_dest_smoothed_rate"]]
-        print('### {}, {}'.format(username, _df['_history_dest_smoothed_rate'].max()))
+        _df = df_users_download_max_vol_history.loc[df_users_download_max_vol_history.loc[:, 'username'] == username, ["username", "from", "until", "history_time", "_history_dest_smoothed_rate"]]
+        _username_download_max.append(username)
+        _from_download_max.append(_df['from'].unique()[0])
+        _until_download_max.append(_df['until'].unique()[0])
+        _download_max_rate.append(_df['_history_dest_smoothed_rate'].max())
+        # print('### {}, {}'.format(username, _df['_history_dest_smoothed_rate'].max()))
         # print(df_users_download_max_vol_history.loc[df_users_download_max_vol_history.loc[:, 'username'] == username, ["username", "history_time", "_history_dest_smoothed_rate"]])
     # print(df_users_download_max_vol_history.loc[:, ["username", "history_time", "_history_dest_smoothed_rate"]])
+
+    _l_users_download_max_rate = list(zip(_username_download_max, _from_download_max, _until_download_max, _download_max_rate))
+    _df_users_download_max_rate = pd.DataFrame(data=_l_users_download_max_rate,
+                                               columns=['username',
+                                                        'from',
+                                                        'until',
+                                                        'max_download_rate'
+                                                        ])
+
+    print(_df_users_download_max_rate.sort(columns='max_download_rate', ascending=False))
 
     # for username in df_users_download_max_vol_history['username'].unique():
     #     if username in df_users_download_max_vol_history['username']:
@@ -308,12 +354,22 @@ def main():
 
 
     df_users_download_vol_history.to_excel(writer, sheet_name='1', startrow=us_start_row, startcol=us_start_col, index=False)
+
     df_users_upload_vol_history.to_excel(writer, sheet_name='1', startrow=us_start_row,
                                          startcol=len(df_users_upload_vol_history)+2, index=False)
+
     df_users_download_rate_history.to_excel(writer, sheet_name='1', startrow=us_start_row+len(df_users_download_vol_history)+2,
                                          startcol=us_start_col, index=False)
+
     df_users_upload_rate_history.to_excel(writer, sheet_name='1', startrow=us_start_row+len(df_users_download_vol_history)+2,
                                             startcol=len(df_users_download_rate_history) + 2, index=False)
+
+    _df_users_download_max_rate.sort(columns='max_download_rate', ascending=False).to_excel(writer, sheet_name='1', startrow=us_start_row + len(df_users_download_vol_history) + 2 + len(_df_users_download_max_rate) + 2,
+                                         startcol=us_start_col, index=False)
+
+    _df_users_upload_max_rate.sort(columns='max_upload_rate', ascending=False).to_excel(writer, sheet_name='1', startrow=us_start_row + len(df_users_download_vol_history) + 2 + len(_df_users_upload_max_rate) + 2,
+                                         startcol=len(_df_users_upload_max_rate) + 2, index=False)
+
     # df_IntfSet.to_excel(writer, sheet_name='opasnet config', startrow=is_start_row, startcol=is_start_col, index=False)
 
     workbook = writer.book
@@ -420,7 +476,7 @@ def main():
                                              'time',
                                              'total_rate'
                                              ])
-    # print (df_intfs_history)
+    print (df_intfs_history)
     writer.save()
 
 if __name__ == '__main__' :
